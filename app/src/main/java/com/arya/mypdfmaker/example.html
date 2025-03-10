@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            padding: 20px;
+            border: 1px solid #ddd;
+        }
+        .invoice-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .invoice-header h1 {
+            margin: 0;
+        }
+        .invoice-details {
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        .invoice-details td {
+            padding: 5px;
+        }
+        .items {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        .items th, .items td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+        .items th {
+            background-color: #f4f4f4;
+        }
+        .total {
+            text-align: right;
+            font-size: 18px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<div class="invoice-header">
+    <h1>Invoice</h1>
+    <p><strong>Date:</strong> 2025-02-19</p>
+</div>
+
+<table class="invoice-details">
+    <tr>
+        <td><strong>Bill To:</strong></td>
+        <td><strong>Invoice #:</strong> 123456</td>
+    </tr>
+    <tr>
+        <td>John Doe</td>
+        <td><strong>Due Date:</strong> 2025-02-26</td>
+    </tr>
+    <tr>
+        <td>123 Street, City, Country</td>
+        <td></td>
+    </tr>
+</table>
+
+<table class="items">
+    <tr>
+        <th>Item</th>
+        <th>Quantity</th>
+        <th>Unit Price</th>
+        <th>Total</th>
+    </tr>
+    <tr>
+        <td>Product 1</td>
+        <td>2</td>
+        <td>$50</td>
+        <td>$100</td>
+    </tr>
+    <tr>
+        <td>Product 2</td>
+        <td>1</td>
+        <td>$30</td>
+        <td>$30</td>
+    </tr>
+    <tr>
+        <td colspan="3" class="total">Subtotal:</td>
+        <td>$130</td>
+    </tr>
+    <tr>
+        <td colspan="3" class="total">Tax (10%):</td>
+        <td>$13</td>
+    </tr>
+    <tr>
+        <td colspan="3" class="total">Grand Total:</td>
+        <td>$143</td>
+    </tr>
+</table>
+
+<p><strong>Payment Instructions:</strong> Please send payment to XYZ Bank, Account #123456789</p>
+
+</body>
+</html>
