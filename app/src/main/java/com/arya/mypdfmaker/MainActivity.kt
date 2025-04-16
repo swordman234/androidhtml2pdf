@@ -47,7 +47,6 @@ class MainActivity : AppCompatActivity() {
                 super.onPageFinished(view, url)
 
                 try {
-                    val jobName = "PDF Maker Document"
                     val attributes = PrintAttributes.Builder()
                         .setMediaSize(PrintAttributes.MediaSize.ISO_A4)
                         .setResolution(PrintAttributes.Resolution("pdf", "pdf", 600, 600))
@@ -60,7 +59,7 @@ class MainActivity : AppCompatActivity() {
                     pdfPrint.print(
                         innerWebView.createPrintDocumentAdapter("auto making pdf.pdf"),
                         path,
-                        "BAJIGUR.pdf"
+                        "BAJIGUR AHAY.pdf"
                     )
                     Log.i("pdf", "PDF created successfully.")
                     Toast.makeText(context, "Success", Toast.LENGTH_SHORT).show()
@@ -74,49 +73,27 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        innerWebView.loadDataWithBaseURL(null, getHtmlFromFile(), "text/html", "UTF-8", null)
-    }
-
-
-    fun exportAsPdf(context: Context) {
-        val innerWebView = WebView(context)
-        innerWebView.webViewClient = WebViewClient()
-        innerWebView.settings.javaScriptEnabled = true
-        innerWebView.loadDataWithBaseURL(null, getHtmlFromFile(), "text/html", "UTF-8", null)
-
-//        innerWebView.loadUrl("https://ocean.hellobill.co.id/webview-v2/report/microbiz-daily/673ff65e2c3b2")
-
-//        val printManager = context.getSystemService(Context.PRINT_SERVICE) as PrintManager
-//        val printAdapter = innerWebView.createPrintDocumentAdapter("sample from html.pdf")
-//        val printAttributes = PrintAttributes.Builder()
-//            .setMediaSize(PrintAttributes.MediaSize.ISO_A4)
-//            .setResolution(PrintAttributes.Resolution("pdf", "pdf",600,600))
-//            .setMinMargins(PrintAttributes.Margins(16,16,16,16))
-//            .build()
-//        printManager.print(
-//            "Test PDF",
-//            printAdapter,
-//            printAttributes)
-
-        try {
-            val jobName = "PDF Maker Document"
-            val attributes = PrintAttributes.Builder()
-                .setMediaSize(PrintAttributes.MediaSize.ISO_A4)
-                .setResolution(PrintAttributes.Resolution("pdf", "pdf", 600, 600))
-                .setMinMargins(PrintAttributes.Margins.NO_MARGINS).build()
-            val path =
-                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
-
-            val pdfPrint = PdfPrint(attributes)
-            pdfPrint.print(
-                innerWebView.createPrintDocumentAdapter("auto pdf.pdf"),
-                path,
-                "PDF Maker Document.pdf"
-            )
-            Log.i("pdf", "pdf created")
-        } catch (e: Exception) {
-            Log.e("pdf", " pdf failed ${e.localizedMessage}")
+        val headerHTML = headerHTML("123", "Arya Suka", "12 April 2020")
+        val summaryHTML = summaryHTML("12.000", "12", "11.000", "50", "1", "100")
+        val top10productList = ArrayList<Product>()
+        for (i in 1..10){
+            top10productList.add(Product("Barang $i", "${i+i}", "10.100.100"))
         }
+        val top10product = top10ProductHTML(top10productList)
+        val paymentTypeList = ArrayList<PaymentType>()
+        for (i in 1..5){
+            paymentTypeList.add(PaymentType("EDC $i", "${i+5}", "12.000.000"))
+        }
+        val paymentType = paymentTypeHTML(paymentTypeList)
+        val staffList = ArrayList<Staff>()
+        for (i in 1..3){
+            staffList.add(Staff("Orang Ke-$i", "${i+3}", "1.000"))
+        }
+        val staff = staffPerformanceHTML(staffList)
+        val profitLossHTML = profitLossHTML("12.000", "30", "1.000", "50.000.000", "10.000.000", "1.000", "1.001", "1", "1000")
+
+        val dataHTML = settingHTML() + headerHTML + summaryHTML + top10product + paymentType + staff + profitLossHTML + chartHTML()
+        innerWebView.loadDataWithBaseURL(null, dataHTML, "text/html", "UTF-8", null)
     }
 
     private fun setupPermissions() {
@@ -152,227 +129,8 @@ class MainActivity : AppCompatActivity() {
 
     }
 
-    private fun getHtmlFromFile(): String {
-       return """
-<div class="header">
-    <h1>LAPORAN HARIAN</h1>
-    <p><strong>Branch ID:</strong> 0123456789</p>
-    <p><strong>Branch Name:</strong> Toko Bunga Matahari</p>
-    <p><strong>Date:</strong> Thursday, 16 January 2025</p>
-</div>
-
-<div class="summary">
-    <div>
-        <p><strong>Penjualan Kotor</strong></p>
-        <h2>Rp35.000.000</h2>
-        <p>+10% dari hari sebelumnya</p>
-    </div>
-    <div>
-        <p><strong>Penjualan Bersih</strong></p>
-        <h2>Rp30.000.000</h2>
-        <p>+10% dari hari sebelumnya</p>
-    </div>
-    <div>
-        <p><strong>Total Pesanan</strong></p>
-        <h2>5.500</h2>
-        <p>+10% dari hari sebelumnya</p>
-    </div>
-</div>
-
-<h2>10 Produk Terbaik</h2>
-<table>
-    <tr>
-        <th>Produk</th>
-        <th>Jumlah Pesanan</th>
-        <th>Penjualan Kotor</th>
-    </tr>
-    <tr><td>Baju Merah</td><td>42</td><td>Rp4.247.602</td></tr>
-    <tr><td>Baju Putih</td><td>30</td><td>Rp3.047.602</td></tr>
-    <tr><td>Baju Hitam</td><td>29</td><td>Rp2.947.602</td></tr>
-    <tr><td>Baju Kuning</td><td>28</td><td>Rp2.847.602</td></tr>
-    <tr><td>Baju Hijau</td><td>27</td><td>Rp2.747.602</td></tr>
-    <tr><td>Baju Ungu</td><td>26</td><td>Rp2.647.602</td></tr>
-    <tr><td>Baju Coklat</td><td>25</td><td>Rp2.547.602</td></tr>
-    <tr><td>Baju Oranye</td><td>24</td><td>Rp2.447.602</td></tr>
-    <tr><td>Baju Biru</td><td>23</td><td>Rp2.347.602</td></tr>
-    <tr><td>Baju Jingga</td><td>22</td><td>Rp2.247.602</td></tr>
-</table>
-
-<h2>Tipe Pembayaran</h2>
-<table>
-    <tr>
-        <th>Tipe Pembayaran</th>
-        <th>Jumlah Transaksi</th>
-        <th>Total Nilai</th>
-    </tr>
-    <tr><td>Cash</td><td>150</td><td>Rp2.200.000</td></tr>
-    <tr><td>Credit Card</td><td>67</td><td>Rp2.200.000</td></tr>
-    <tr><td>OVO</td><td>56</td><td>Rp2.200.000</td></tr>
-    <tr><td>Mimin</td><td>17</td><td>Rp2.200.000</td></tr>
-    <tr><td>Voucher Bali Tourism</td><td>9</td><td>Rp2.200.000</td></tr>
-    <tr><td>DSP Debit</td><td>90</td><td>Rp2.200.000</td></tr>
-</table>
-
-<h2>Kinerja Staff</h2>
-<table>
-    <tr>
-        <th>Nama</th>
-        <th>Jumlah Transaksi</th>
-        <th>Total Nilai</th>
-    </tr>
-    <tr><td>Budi</td><td>150</td><td>Rp2.247.602</td></tr>
-    <tr><td>Herman</td><td>67</td><td>Rp2.347.602</td></tr>
-    <tr><td>Lala</td><td>17</td><td>Rp2.447.602</td></tr>
-    <tr><td>Joko</td><td>96</td><td>Rp2.547.602</td></tr>
-</table>
-
-<h2>Laba Rugi</h2>
-<div class="profit-container">
-    <div class="profit-summary">
-        <p>Profit</p>
-        <h2>Rp4.500.000</h2>
-    </div>
-    <div class="profit-details">
-        <div><p>Total Barang Terjual</p><h3>Rp5.000.000</h3></div>
-        <div><p>Subtotal</p><h3>Rp5.000.000</h3></div>
-        <div><p>Total Diskon Bill</p><h3>Rp5.000</h3></div>
-        <div><p>Biaya Layanan</p><h3>Rp5.000</h3></div>
-        <div><p>Pajak</p><h3>Rp5.000</h3></div>
-        <div><p>Penjualan Kotor</p><h3>Rp5.005.000</h3></div>
-        <div><p>Penjualan Bersih</p><h3>Rp5.000.000</h3></div>
-        <div><p>Total COGS</p><h3>Rp5.000</h3></div>
-    </div>
-</div>
-
-<h2>Gross and Net Sales</h2>
-<div class="sales-container">
-    <canvas id="weeklySalesChart"></canvas>
-    <canvas id="monthlySalesChart"></canvas>
-</div>
-
-<script>
-    // Data for Weekly Sales Chart
-    const weeklySalesData = {
-        labels: ["08 Dec - 14 Dec", "15 Dec - 21 Dec", "22 Dec - 28 Dec", "29 Dec - 04 Jan"],
-        datasets: [
-            {
-                label: "Gross Sales",
-                data: [28700000, 0, 0, 0],
-                backgroundColor: "rgba(72, 180, 127, 0.6)"
-            },
-            {
-                label: "Net Sales",
-                data: [26100000, 0, 0, 0],
-                backgroundColor: "rgba(144, 238, 144, 0.6)"
-            }
-        ]
-    };
-
-    // Data for Monthly Sales Chart
-    const monthlySalesData = {
-        labels: ["October", "November", "December", "January"],
-        datasets: [
-            {
-                label: "Gross Sales",
-                data: [0, 41600000, 48500000, 0],
-                backgroundColor: "rgba(72, 180, 127, 0.6)"
-            },
-            {
-                label: "Net Sales",
-                data: [0, 38100000, 44000000, 0],
-                backgroundColor: "rgba(144, 238, 144, 0.6)"
-            }
-        ]
-    };
-
-    // Render Weekly Sales Chart
-    new Chart(document.getElementById("weeklySalesChart"), {
-        type: "bar",
-        data: weeklySalesData,
-        options: {
-            responsive: true,
-            plugins: {
-                legend: { position: "top" }
-            }
-        }
-    });
-
-    // Render Monthly Sales Chart
-    new Chart(document.getElementById("monthlySalesChart"), {
-        type: "bar",
-        data: monthlySalesData,
-        options: {
-            responsive: true,
-            plugins: {
-                legend: { position: "top" }
-            }
-        }
-    });
-</script>
-
-<h2>Total Order</h2>
-<div class="sales-container">
-    <canvas id="monthlyOrderChart"></canvas>
-    <canvas id="weeklyOrderChart"></canvas>
-</div>
-
-<script>
-    // Data for Monthly Order Chart
-    const monthlyOrderData = {
-        labels: ["October", "November", "December", "January"],
-        datasets: [
-            {
-                label: "Total Order",
-                data: [0, 115, 184, 0],
-                backgroundColor: "rgba(144, 238, 144, 0.6)"
-            }
-        ]
-    };
-
-    // Data for Weekly Order Chart
-    const weeklyOrderData = {
-        labels: ["08 Dec - 14 Dec", "15 Dec - 21 Dec", "22 Dec - 28 Dec", "29 Dec - 04 Jan"],
-        datasets: [
-            {
-                label: "Total Order",
-                data: [81, 0, 0, 0],
-                backgroundColor: "rgba(144, 238, 144, 0.6)"
-            }
-        ]
-    };
-
-    // Render Monthly Order Chart
-    new Chart(document.getElementById("monthlyOrderChart"), {
-        type: "bar",
-        data: monthlyOrderData,
-        options: {
-            responsive: true,
-            plugins: {
-                legend: { position: "top" }
-            }
-        }
-    });
-
-    // Render Weekly Order Chart
-    new Chart(document.getElementById("weeklyOrderChart"), {
-        type: "bar",
-        data: weeklyOrderData,
-        options: {
-            responsive: true,
-            plugins: {
-                legend: { position: "top" }
-            }
-        }
-    });
-</script>
-
-</body>
-</html>
-""".trimIndent()
-    }
-
     //style setting, script for chart, and first body in here
-    private fun headerHTML():String{
+    private fun settingHTML():String{
         return """<!DOCTYPE html>
 <html lang="en">
 
@@ -493,5 +251,260 @@ class MainActivity : AppCompatActivity() {
 <body>""".trimIndent()
     }
 
+    private fun headerHTML(branchID : String, branchName : String, date : String):String{
+        return """
+            <div class="header">
+                <h1>LAPORAN HARIAN</h1>
+                <p><strong>Branch ID:</strong> $branchID</p>
+                <p><strong>Branch Name:</strong> $branchName</p>
+                <p><strong>Date:</strong> $date</p>
+            </div>
+        """.trimIndent()
+    }
+
+    private fun summaryHTML(gross : String, grossPercent : String, net : String, netPercent : String, sumOrder : String, sumOrderPercent : String):String{
+        return """
+            <div class="summary">
+                <div>
+                    <p><strong>Penjualan Kotor</strong></p>
+                    <h2>Rp$gross</h2>
+                    <p>$grossPercent% dari hari sebelumnya</p>
+                </div>
+                <div>
+                    <p><strong>Penjualan Bersih</strong></p>
+                    <h2>Rp$net</h2>
+                    <p>$netPercent% dari hari sebelumnya</p>
+                </div>
+                <div>
+                    <p><strong>Total Pesanan</strong></p>
+                    <h2>$sumOrder</h2>
+                    <p>$sumOrderPercent% dari hari sebelumnya</p>
+                </div>
+            </div>
+        """.trimIndent()
+    }
+
+    private fun top10ProductHTML(top10product : ArrayList<Product>):String{
+        val top10productHTML = StringBuilder()
+        top10product.forEach{
+            top10productHTML.append("<tr><td>${it.name}</td><td>${it.totalOrder}</td><td>Rp${it.gross}</td></tr>")
+        }
+        return """
+            <h2>10 Produk Terbaik</h2>
+            <table>
+                <tr>
+                    <th>Produk</th>
+                    <th>Jumlah Pesanan</th>
+                    <th>Penjualan Kotor</th>
+                </tr>
+                $top10productHTML
+            </table>
+        """.trimIndent()
+    }
+
+    private fun paymentTypeHTML(paymentTypeList : ArrayList<PaymentType>):String{
+        val paymentTypeHTML = StringBuilder()
+        paymentTypeList.forEach{
+            paymentTypeHTML.append("<tr><td>${it.name}</td><td>${it.totalTransaction}</td><td>Rp${it.summary}</td></tr>")
+        }
+        return """
+            <h2>Tipe Pembayaran</h2>
+            <table>
+                <tr>
+                    <th>Tipe Pembayaran</th>
+                    <th>Jumlah Transaksi</th>
+                    <th>Total Nilai</th>
+                </tr>
+                $paymentTypeHTML
+            </table>
+        """.trimIndent()
+    }
+
+    private fun staffPerformanceHTML(staff : ArrayList<Staff>):String{
+        val staffPerformanceHTML = StringBuilder()
+        staff.forEach{
+            staffPerformanceHTML.append("<tr><td>${it.name}</td><td>${it.totalTransaction}</td><td>Rp${it.summary}</td></tr>")
+        }
+        return """
+            <h2>Kinerja Staff</h2>
+            <table>
+                <tr>
+                    <th>Nama</th>
+                    <th>Jumlah Transaksi</th>
+                    <th>Total Nilai</th>
+                </tr>
+                $staffPerformanceHTML
+            </table>
+        """.trimIndent()
+    }
+
+    private fun profitLossHTML(profit : String, salesTotal : String, subtotal : String, discountTotal : String, serviceCharge : String, tax : String, gross: String, net: String, cogs : String):String{
+        return """
+            <h2>Laba Rugi</h2>
+            <div class="profit-container">
+                <div class="profit-summary">
+                    <p>Profit</p>
+                    <h2>Rp$profit</h2>
+                </div>
+                <div class="profit-details">
+                    <div><p>Total Barang Terjual</p><h3>Rp$salesTotal</h3></div>
+                    <div><p>Subtotal</p><h3>Rp$subtotal</h3></div>
+                    <div><p>Total Diskon Bill</p><h3>Rp$discountTotal</h3></div>
+                    <div><p>Biaya Layanan</p><h3>Rp$serviceCharge</h3></div>
+                    <div><p>Pajak</p><h3>Rp$tax</h3></div>
+                    <div><p>Penjualan Kotor</p><h3>Rp$gross</h3></div>
+                    <div><p>Penjualan Bersih</p><h3>Rp$net</h3></div>
+                    <div><p>Total COGS</p><h3>Rp$cogs</h3></div>
+                </div>
+            </div>
+        """.trimIndent()
+    }
+
+    private fun chartHTML():String{
+        return """
+            <h2>Gross and Net Sales</h2>
+            <div class="sales-container">
+                <canvas id="weeklySalesChart"></canvas>
+                <canvas id="monthlySalesChart"></canvas>
+            </div>
+
+            <script>
+                // Data for Weekly Sales Chart
+                const weeklySalesData = {
+                    labels: ["08 Dec - 14 Dec", "15 Dec - 21 Dec", "22 Dec - 28 Dec", "29 Dec - 04 Jan"],
+                    datasets: [
+                        {
+                            label: "Gross Sales",
+                            data: [28700000, 0, 0, 0],
+                            backgroundColor: "rgba(72, 180, 127, 0.6)"
+                        },
+                        {
+                            label: "Net Sales",
+                            data: [26100000, 0, 0, 0],
+                            backgroundColor: "rgba(144, 238, 144, 0.6)"
+                        }
+                    ]
+                };
+
+                // Data for Monthly Sales Chart
+                const monthlySalesData = {
+                    labels: ["October", "November", "December", "January"],
+                    datasets: [
+                        {
+                            label: "Gross Sales",
+                            data: [0, 41600000, 48500000, 0],
+                            backgroundColor: "rgba(72, 180, 127, 0.6)"
+                        },
+                        {
+                            label: "Net Sales",
+                            data: [0, 38100000, 44000000, 0],
+                            backgroundColor: "rgba(144, 238, 144, 0.6)"
+                        }
+                    ]
+                };
+
+                // Render Weekly Sales Chart
+                new Chart(document.getElementById("weeklySalesChart"), {
+                    type: "bar",
+                    data: weeklySalesData,
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: { position: "top" }
+                        }
+                    }
+                });
+
+                // Render Monthly Sales Chart
+                new Chart(document.getElementById("monthlySalesChart"), {
+                    type: "bar",
+                    data: monthlySalesData,
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: { position: "top" }
+                        }
+                    }
+                });
+            </script>
+
+            <h2>Total Order</h2>
+            <div class="sales-container">
+                <canvas id="monthlyOrderChart"></canvas>
+                <canvas id="weeklyOrderChart"></canvas>
+            </div>
+
+            <script>
+                // Data for Monthly Order Chart
+                const monthlyOrderData = {
+                    labels: ["October", "November", "December", "January"],
+                    datasets: [
+                        {
+                            label: "Total Order",
+                            data: [0, 115, 184, 0],
+                            backgroundColor: "rgba(144, 238, 144, 0.6)"
+                        }
+                    ]
+                };
+
+                // Data for Weekly Order Chart
+                const weeklyOrderData = {
+                    labels: ["08 Dec - 14 Dec", "15 Dec - 21 Dec", "22 Dec - 28 Dec", "29 Dec - 04 Jan"],
+                    datasets: [
+                        {
+                            label: "Total Order",
+                            data: [81, 0, 0, 0],
+                            backgroundColor: "rgba(144, 238, 144, 0.6)"
+                        }
+                    ]
+                };
+
+                // Render Monthly Order Chart
+                new Chart(document.getElementById("monthlyOrderChart"), {
+                    type: "bar",
+                    data: monthlyOrderData,
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: { position: "top" }
+                        }
+                    }
+                });
+
+                // Render Weekly Order Chart
+                new Chart(document.getElementById("weeklyOrderChart"), {
+                    type: "bar",
+                    data: weeklyOrderData,
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: { position: "top" }
+                        }
+                    }
+                });
+            </script>
+
+            </body>
+            </html>
+        """.trimIndent()
+    }
 
 }
+
+data class Product(
+    val name : String,
+    val totalOrder : String,
+    val gross : String
+)
+
+data class PaymentType(
+    val name: String,
+    val totalTransaction : String,
+    val summary : String
+)
+
+data class Staff(
+    val name: String,
+    val totalTransaction: String,
+    val summary: String
+)
