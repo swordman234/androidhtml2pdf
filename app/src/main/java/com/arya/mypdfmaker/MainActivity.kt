@@ -155,124 +155,126 @@ class MainActivity : AppCompatActivity() {
 
     //style setting, script for chart, and first body in here
     private fun settingHTML():String{
-        return """<!DOCTYPE html>
-<html lang="en">
-
-<!-- Include Chart.js -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Laporan Harian</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            padding: 20px;
-            border: 1px solid #ddd;
-        }
-        .header {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        .header h1 {
-            margin: 0;
-        }
-        .summary, .profit {
-            display: flex;
-            justify-content: space-around;
-            margin-bottom: 20px;
-        }
-        .summary div, .profit div {
-            border: 1px solid #ddd;
-            padding: 15px;
-            text-align: center;
-            width: 30%;
-            background-color: #f9f9f9;
-        }
-        .table-container {
-            width: 100%;
-            margin-bottom: 20px;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
-        }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 10px;
-            text-align: left;
-        }
-        th {
-            background-color: #f4f4f4;
-        }
-        .chart-container {
-            width: 100%;
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        .profit-container {
-            border: 1px solid #ddd;
-            padding: 20px;
-            border-radius: 10px;
-            display: flex;
-            flex-direction: column;
-            max-width: 100%;
-            background-color: #fff;
-        }
-
-        .profit-summary {
-            font-weight: bold;
-            font-size: 18px;
-        }
-
-        .profit-summary h2 {
-            margin: 5px 0;
-            font-size: 28px;
-            font-weight: bold;
-            color: #333;
-        }
-
-        .profit-details {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
-            margin-top: 15px;
-        }
-
-        .profit-details div {
-            background: #f8f8f8;
-            padding: 10px;
-            border-radius: 5px;
-        }
-
-        .profit-details p {
-            margin: 0;
-            font-size: 14px;
-            color: #555;
-        }
-
-        .profit-details h3 {
-            margin: 5px 0;
-            font-size: 16px;
-            font-weight: bold;
-        }
-
-        .sales-container {
-            border: 1px solid #ddd;
-            padding: 20px;
-            border-radius: 10px;
-            width: 600px;
-            background-color: #fff;
-            margin-top: 20px;
-        }
-    </style>
-
-</head>
-<body>""".trimIndent()
+        return """
+            <!DOCTYPE html>
+            <html lang="en">
+            
+            <!-- Include Chart.js -->
+            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+            
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Laporan Harian</title>
+                <style>
+                    body {
+                        font-family: Arial, sans-serif;
+                        margin: 20px;
+                        padding: 20px;
+                        border: 1px solid #ddd;
+                    }
+                    .header {
+                        text-align: center;
+                        margin-bottom: 20px;
+                    }
+                    .header h1 {
+                        margin: 0;
+                    }
+                    .summary, .profit {
+                        display: flex;
+                        justify-content: space-around;
+                        margin-bottom: 20px;
+                    }
+                    .summary div, .profit div {
+                        border: 1px solid #ddd;
+                        padding: 15px;
+                        text-align: center;
+                        width: 30%;
+                        background-color: #f9f9f9;
+                    }
+                    .table-container {
+                        width: 100%;
+                        margin-bottom: 20px;
+                    }
+                    table {
+                        width: 100%;
+                        border-collapse: collapse;
+                        margin-bottom: 20px;
+                    }
+                    th, td {
+                        border: 1px solid #ddd;
+                        padding: 10px;
+                        text-align: left;
+                    }
+                    th {
+                        background-color: #f4f4f4;
+                    }
+                    .chart-container {
+                        width: 100%;
+                        text-align: center;
+                        margin-bottom: 20px;
+                    }
+            
+                    .profit-container {
+                        border: 1px solid #ddd;
+                        padding: 20px;
+                        border-radius: 10px;
+                        display: flex;
+                        flex-direction: column;
+                        max-width: 100%;
+                        background-color: #fff;
+                    }
+            
+                    .profit-summary {
+                        font-weight: bold;
+                        font-size: 18px;
+                    }
+            
+                    .profit-summary h2 {
+                        margin: 5px 0;
+                        font-size: 28px;
+                        font-weight: bold;
+                        color: #333;
+                    }
+            
+                    .profit-details {
+                        display: grid;
+                        grid-template-columns: repeat(4, 1fr);
+                        gap: 10px;
+                        margin-top: 15px;
+                    }
+            
+                    .profit-details div {
+                        background: #f8f8f8;
+                        padding: 10px;
+                        border-radius: 5px;
+                    }
+            
+                    .profit-details p {
+                        margin: 0;
+                        font-size: 14px;
+                        color: #555;
+                    }
+            
+                    .profit-details h3 {
+                        margin: 5px 0;
+                        font-size: 16px;
+                        font-weight: bold;
+                    }
+            
+                    .sales-container {
+                        border: 1px solid #ddd;
+                        padding: 20px;
+                        border-radius: 10px;
+                        width: 600px;
+                        background-color: #fff;
+                        margin-top: 20px;
+                    }
+                </style>
+            
+            </head>
+            <body>
+        """.trimIndent()
     }
 
     private fun headerHTML(branchID : String, branchName : String, date : String):String{
