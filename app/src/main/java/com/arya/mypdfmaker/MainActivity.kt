@@ -1,30 +1,25 @@
 package com.arya.mypdfmaker
 
 import android.Manifest
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
-import android.os.CancellationSignal
 import android.os.Environment
-import android.os.ParcelFileDescriptor
-import android.print.PageRange
-import android.print.PdfConverter
 import android.print.PdfPrint
 import android.print.PrintAttributes
-import android.print.PrintDocumentAdapter
-import android.print.PrintManager
-import android.provider.Settings
 import android.util.Log
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import androidx.documentfile.provider.DocumentFile
 import com.arya.mypdfmaker.databinding.ActivityMainBinding
-import com.tom_roush.pdfbox.android.PDFBoxResourceLoader
 import java.io.File
 
 
@@ -33,12 +28,37 @@ class MainActivity : AppCompatActivity() {
     private lateinit var webView : WebView
     private lateinit var binding: ActivityMainBinding
 
+    private var folderPickerLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            val folderUri = result.data?.data ?: return@registerForActivityResult
+
+            // Persist permission
+            contentResolver.takePersistableUriPermission(
+                folderUri,
+                Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+            )
+
+            // Call your PDF export
+            exportPdf(this, folderUri)
+        }
+    }
+
     private var permissions = arrayOf(
         Manifest.permission.READ_EXTERNAL_STORAGE,
         Manifest.permission.WRITE_EXTERNAL_STORAGE,
     )
 
-    fun exportPdf(context: Context) {
+    fun openFolderPicker() {
+        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT_TREE).apply {
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION or
+                    Intent.FLAG_GRANT_WRITE_URI_PERMISSION or
+                    Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION or
+                    Intent.FLAG_GRANT_PREFIX_URI_PERMISSION)
+        }
+        folderPickerLauncher.launch(intent)
+    }
+
+    fun exportPdf(context: Context, folderUri: Uri) {
         val innerWebView = WebView(context)
         innerWebView.settings.javaScriptEnabled = true
 
@@ -53,13 +73,106 @@ class MainActivity : AppCompatActivity() {
                         .setMinMargins(PrintAttributes.Margins.NO_MARGINS)
                         .build()
 
+                    val pdfPrint = PdfPrint(attributes)
+
+                    // Create the file in the selected folder
+                    val folder = DocumentFile.fromTreeUri(context, folderUri)
+                    val pdfFile = folder?.createFile("application/pdf", "BAJIGUR.pdf")
+
+                    if (pdfFile != null) {
+                        val pfd = context.contentResolver.openFileDescriptor(pdfFile.uri, "w")
+                        pdfPrint.printToSaf(innerWebView.createPrintDocumentAdapter("auto-making-pdf"), pfd!!) {
+                            Toast.makeText(context, "PDF saved successfully", Toast.LENGTH_SHORT).show()
+                        }
+                    } else {
+                        Toast.makeText(context, "Failed to create file", Toast.LENGTH_SHORT).show()
+                    }
+
+                } catch (e: Exception) {
+                    Log.e("PDF", "Error: ${e.message}", e)
+                    Toast.makeText(context, "PDF failed: ${e.localizedMessage}", Toast.LENGTH_SHORT).show()
+                }
+
+                innerWebView.settings.javaScriptEnabled = false
+            }
+        }
+
+        innerWebView.loadDataWithBaseURL(null, getHtmlFromFile(), "text/html", "UTF-8", null)
+    }
+
+    fun exportPdf2(context: Context, folderUri: Uri) {
+        val innerWebView = WebView(context)
+        innerWebView.settings.javaScriptEnabled = true
+
+        innerWebView.webViewClient = object : WebViewClient() {
+            override fun onPageFinished(view: WebView?, url: String?) {
+                super.onPageFinished(view, url)
+
+                try {
+                    val attributes = PrintAttributes.Builder()
+                        .setMediaSize(PrintAttributes.MediaSize.ISO_A4)
+                        .setResolution(PrintAttributes.Resolution("pdf", "pdf", 600, 600))
+                        .setMinMargins(PrintAttributes.Margins.NO_MARGINS)
+                        .build()
+
+                    val pdfPrint = PdfPrint(attributes)
+
+                    // 1. Print to temp file
+                    val tempFile = File(context.cacheDir, "temp_output.pdf")
+                    pdfPrint.printToFile(innerWebView.createPrintDocumentAdapter("auto making pdf.pdf"), tempFile) {
+
+                        // 2. Save to SAF folder
+                        val docFile = DocumentFile.fromTreeUri(context, folderUri)
+                        val pdfDoc = docFile?.createFile("application/pdf", "BAJIGUR")
+
+                        if (pdfDoc != null) {
+                            context.contentResolver.openOutputStream(pdfDoc.uri)?.use { output ->
+                                tempFile.inputStream().use { it.copyTo(output) }
+                            }
+                            Toast.makeText(context, "PDF saved to selected folder", Toast.LENGTH_SHORT).show()
+                        } else {
+                            Toast.makeText(context, "Failed to create file", Toast.LENGTH_SHORT).show()
+                        }
+
+                        tempFile.delete()
+                    }
+
+                } catch (e: Exception) {
+                    Log.d("DEBUG", e.localizedMessage)
+                    Toast.makeText(context, "PDF failed: ${e.localizedMessage}", Toast.LENGTH_SHORT).show()
+                }
+
+                innerWebView.settings.javaScriptEnabled = false
+            }
+        }
+
+        innerWebView.loadDataWithBaseURL(null, getHtmlFromFile(), "text/html", "UTF-8", null)
+    }
+
+
+    fun exportPdf(context: Context) {
+        val innerWebView = WebView(context)
+        innerWebView.settings.javaScriptEnabled = true
+
+        innerWebView.webViewClient = object : WebViewClient() {
+            override fun onPageFinished(view: WebView?, url: String?) {
+                super.onPageFinished(view, url)
+
+                try {
+                    val jobName = "PDF Maker Document"
+                    val attributes = PrintAttributes.Builder()
+                        .setMediaSize(PrintAttributes.MediaSize.ISO_A4)
+                        .setResolution(PrintAttributes.Resolution("pdf", "pdf", 600, 600))
+                        .setMinMargins(PrintAttributes.Margins.NO_MARGINS)
+                        .build()
+
                     val path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
 
                     val pdfPrint = PdfPrint(attributes)
                     pdfPrint.print(
                         innerWebView.createPrintDocumentAdapter("auto making pdf.pdf"),
                         path,
-                        "BAJIGUR AHAY.pdf"
+                        "BAJIGUR.pdf"
                     )
                     Log.i("pdf", "PDF created successfully.")
                     Toast.makeText(context, "Success", Toast.LENGTH_SHORT).show()
@@ -124,7 +237,7 @@ class MainActivity : AppCompatActivity() {
 //        webView.loadDataWithBaseURL(null, getHtmlFromFile(), "text/html", "UTF-8", null)
 
         binding.btnCreatePdf.setOnClickListener {
-            exportPdf(this)
+            openFolderPicker()
         }
 
     }
