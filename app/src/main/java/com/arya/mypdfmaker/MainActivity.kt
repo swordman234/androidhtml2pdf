@@ -371,15 +371,17 @@ class MainActivity : AppCompatActivity() {
             top10productHTML.append("<tr><td>${it.name}</td><td>${it.totalOrder}</td><td>Rp${it.gross}</td></tr>")
         }
         return """
-            <h2>10 Produk Terbaik</h2>
-            <table>
-                <tr>
-                    <th>Produk</th>
-                    <th>Jumlah Pesanan</th>
-                    <th>Penjualan Kotor</th>
-                </tr>
-                $top10productHTML
-            </table>
+            <div style = "page-break-after: always">
+                <h2>10 Produk Terbaik</h2>
+                <table>
+                    <tr>
+                        <th>Produk</th>
+                        <th>Jumlah Pesanan</th>
+                        <th>Penjualan Kotor</th>
+                    </tr>
+                    $top10productHTML
+                </table>
+            </div>
         """.trimIndent()
     }
 
@@ -422,7 +424,7 @@ class MainActivity : AppCompatActivity() {
     private fun profitLossHTML(profit : String, salesTotal : String, subtotal : String, discountTotal : String, serviceCharge : String, tax : String, gross: String, net: String, cogs : String):String{
         return """
             <h2>Laba Rugi</h2>
-            <div class="profit-container">
+            <div class="profit-container"; style = "page-break-after: always">
                 <div class="profit-summary">
                     <p>Profit</p>
                     <h2>Rp$profit</h2>
@@ -468,7 +470,7 @@ class MainActivity : AppCompatActivity() {
 
         return """
             <h2>Gross and Net Sales</h2>
-            <div class="sales-container">
+            <div class="sales-container"; style = "page-break-after: always">
                 <canvas id="weeklySalesChart"></canvas>
                 <canvas id="monthlySalesChart"></canvas>
             </div>
