@@ -7,20 +7,20 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
-import android.os.Environment
 import android.print.PdfPrint
 import android.print.PrintAttributes
 import android.util.Log
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.widget.Toast
-import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.documentfile.provider.DocumentFile
 import com.arya.mypdfmaker.databinding.ActivityMainBinding
-import java.io.File
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 
 class MainActivity : AppCompatActivity() {
@@ -77,8 +77,9 @@ class MainActivity : AppCompatActivity() {
 
                     // Create the file in the selected folder
                     val folder = DocumentFile.fromTreeUri(context, folderUri)
-                    val pdfFile = folder?.createFile("application/pdf", "BAJIGUR.pdf")
-
+                    val pdfFile = folder?.createFile(
+                        "application/pdf",
+                        "${SimpleDateFormat("yyyy-MM-dd HH.mm.SS", Locale.getDefault()).format(Date())}.pdf")
                     if (pdfFile != null) {
                         val pfd = context.contentResolver.openFileDescriptor(pdfFile.uri, "w")
                         pdfPrint.printToSaf(innerWebView.createPrintDocumentAdapter("auto-making-pdf"), pfd!!) {
@@ -116,7 +117,63 @@ class MainActivity : AppCompatActivity() {
         val staff = staffPerformanceHTML(staffList)
         val profitLossHTML = profitLossHTML("12.000", "30", "1.000", "50.000.000", "10.000.000", "1.000", "1.001", "1", "1000")
 
-        val dataHTML = settingHTML() + headerHTML + summaryHTML + top10product + paymentType + staff + profitLossHTML + chartHTML()
+        val salesByWeek = ArrayList<SalesByWeek>()
+        for(i in 1..4){
+            salesByWeek.add(
+                SalesByWeek(
+                    "WEEK $i",
+                    SalesItem(
+                        "${10000*i}",
+                        "${10000*i}",
+                        "${20000*i-5555}",
+                        "${10000*i}",
+                        "${10000*i}",
+                        "${10000*i}",
+                        "${10000*i}",
+                        "${10000*i}",
+                        "${10000*i}",
+                        "${10000*i}",
+                        10000*i,
+                        10000*i,
+                        10000*i,
+                        10000*i,
+                        10000*i,
+                        "${10000*i}",
+                        10000*i,
+                        )
+                )
+            )
+        }
+
+        val salesByMonth = ArrayList<SalesByMonth>()
+        for(i in 1..4){
+            salesByMonth.add(
+                SalesByMonth(
+                    "MONTH $i",
+                    SalesItem(
+                        "${10000*i}",
+                        "${10000*i}",
+                        "${20000*i-5555}",
+                        "${10000*i}",
+                        "${10000*i}",
+                        "${10000*i}",
+                        "${10000*i}",
+                        "${10000*i}",
+                        "${10000*i}",
+                        "${10000*i}",
+                        10000*i,
+                        10000*i,
+                        10000*i,
+                        10000*i,
+                        10000*i,
+                        "${10000*i}",
+                        10000*i,
+                        )
+                )
+            )
+        }
+
+        val dataHTML = settingHTML() + headerHTML + summaryHTML + top10product + paymentType + staff + profitLossHTML + chartHTML(salesByWeek, salesByMonth)
         innerWebView.loadDataWithBaseURL(null, dataHTML, "text/html", "UTF-8", null)
     }
 
@@ -155,124 +212,124 @@ class MainActivity : AppCompatActivity() {
 
     //style setting, script for chart, and first body in here
     private fun settingHTML():String{
-        return """<!DOCTYPE html>
-<html lang="en">
-
-<!-- Include Chart.js -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Laporan Harian</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            padding: 20px;
-            border: 1px solid #ddd;
-        }
-        .header {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        .header h1 {
-            margin: 0;
-        }
-        .summary, .profit {
-            display: flex;
-            justify-content: space-around;
-            margin-bottom: 20px;
-        }
-        .summary div, .profit div {
-            border: 1px solid #ddd;
-            padding: 15px;
-            text-align: center;
-            width: 30%;
-            background-color: #f9f9f9;
-        }
-        .table-container {
-            width: 100%;
-            margin-bottom: 20px;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
-        }
-        th, td {
-            border: 1px solid #ddd;
-            padding: 10px;
-            text-align: left;
-        }
-        th {
-            background-color: #f4f4f4;
-        }
-        .chart-container {
-            width: 100%;
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        .profit-container {
-            border: 1px solid #ddd;
-            padding: 20px;
-            border-radius: 10px;
-            display: flex;
-            flex-direction: column;
-            max-width: 100%;
-            background-color: #fff;
-        }
-
-        .profit-summary {
-            font-weight: bold;
-            font-size: 18px;
-        }
-
-        .profit-summary h2 {
-            margin: 5px 0;
-            font-size: 28px;
-            font-weight: bold;
-            color: #333;
-        }
-
-        .profit-details {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
-            margin-top: 15px;
-        }
-
-        .profit-details div {
-            background: #f8f8f8;
-            padding: 10px;
-            border-radius: 5px;
-        }
-
-        .profit-details p {
-            margin: 0;
-            font-size: 14px;
-            color: #555;
-        }
-
-        .profit-details h3 {
-            margin: 5px 0;
-            font-size: 16px;
-            font-weight: bold;
-        }
-
-        .sales-container {
-            border: 1px solid #ddd;
-            padding: 20px;
-            border-radius: 10px;
-            width: 600px;
-            background-color: #fff;
-            margin-top: 20px;
-        }
-    </style>
-
-</head>
-<body>""".trimIndent()
+        return """
+            <!DOCTYPE html>
+            <html lang="en">
+            <!-- Include Chart.js -->
+            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+            
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Laporan Harian</title>
+                <style>
+                    body {
+                        font-family: Arial, sans-serif;
+                        margin: 20px;
+                        padding: 20px;
+                        border: 1px solid #ddd;
+                    }
+                    .header {
+                        text-align: center;
+                        margin-bottom: 20px;
+                    }
+                    .header h1 {
+                        margin: 0;
+                    }
+                    .summary, .profit {
+                        display: flex;
+                        justify-content: space-around;
+                        margin-bottom: 20px;
+                    }
+                    .summary div, .profit div {
+                        border: 1px solid #ddd;
+                        padding: 15px;
+                        text-align: center;
+                        width: 30%;
+                        background-color: #f9f9f9;
+                    }
+                    .table-container {
+                        width: 100%;
+                        margin-bottom: 20px;
+                    }
+                    table {
+                        width: 100%;
+                        border-collapse: collapse;
+                        margin-bottom: 20px;
+                    }
+                    th, td {
+                        border: 1px solid #ddd;
+                        padding: 10px;
+                        text-align: left;
+                    }
+                    th {
+                        background-color: #f4f4f4;
+                    }
+                    .chart-container {
+                        width: 100%;
+                        text-align: center;
+                        margin-bottom: 20px;
+                    }
+            
+                    .profit-container {
+                        border: 1px solid #ddd;
+                        padding: 20px;
+                        border-radius: 10px;
+                        display: flex;
+                        flex-direction: column;
+                        max-width: 100%;
+                        background-color: #fff;
+                    }
+            
+                    .profit-summary {
+                        font-weight: bold;
+                        font-size: 18px;
+                    }
+            
+                    .profit-summary h2 {
+                        margin: 5px 0;
+                        font-size: 28px;
+                        font-weight: bold;
+                        color: #333;
+                    }
+            
+                    .profit-details {
+                        display: grid;
+                        grid-template-columns: repeat(4, 1fr);
+                        gap: 10px;
+                        margin-top: 15px;
+                    }
+            
+                    .profit-details div {
+                        background: #f8f8f8;
+                        padding: 10px;
+                        border-radius: 5px;
+                    }
+            
+                    .profit-details p {
+                        margin: 0;
+                        font-size: 14px;
+                        color: #555;
+                    }
+            
+                    .profit-details h3 {
+                        margin: 5px 0;
+                        font-size: 16px;
+                        font-weight: bold;
+                    }
+            
+                    .sales-container {
+                        border: 1px solid #ddd;
+                        padding: 20px;
+                        border-radius: 10px;
+                        width: 600px;
+                        background-color: #fff;
+                        margin-top: 20px;
+                    }
+                </style>
+            </head>
+            <body>
+        """.trimIndent()
     }
 
     private fun headerHTML(branchID : String, branchName : String, date : String):String{
@@ -384,7 +441,31 @@ class MainActivity : AppCompatActivity() {
         """.trimIndent()
     }
 
-    private fun chartHTML():String{
+    private fun chartHTML(salesByWeek: ArrayList<SalesByWeek>, salesByMonth: ArrayList<SalesByMonth>):String{
+        val weekLabel = StringBuilder()
+        val weekGross = StringBuilder()
+        val weekNet = StringBuilder()
+        val weekTotalOrder = StringBuilder()
+        salesByWeek.forEach {
+            weekLabel.append("\"${it.week}\",")
+            weekGross.append("${it.data.totalGrossSales},")
+            weekNet.append("${it.data.totalNetSales},")
+            weekTotalOrder.append("${it.data.totalTransaction},")
+        }
+
+
+        val monthLabel = StringBuilder()
+        val monthGross = StringBuilder()
+        val monthNet = StringBuilder()
+        val monthTotalOrder = StringBuilder()
+        salesByMonth.forEach {
+            monthLabel.append("\"${it.month}\",")
+            monthGross.append("${it.data.totalGrossSales},")
+            monthNet.append("${it.data.totalNetSales},")
+            monthTotalOrder.append("${it.data.totalTransaction},")
+        }
+
+
         return """
             <h2>Gross and Net Sales</h2>
             <div class="sales-container">
@@ -395,16 +476,16 @@ class MainActivity : AppCompatActivity() {
             <script>
                 // Data for Weekly Sales Chart
                 const weeklySalesData = {
-                    labels: ["08 Dec - 14 Dec", "15 Dec - 21 Dec", "22 Dec - 28 Dec", "29 Dec - 04 Jan"],
+                    labels: [$weekLabel],
                     datasets: [
                         {
                             label: "Gross Sales",
-                            data: [28700000, 0, 0, 0],
+                            data: [$weekGross],
                             backgroundColor: "rgba(72, 180, 127, 0.6)"
                         },
                         {
                             label: "Net Sales",
-                            data: [26100000, 0, 0, 0],
+                            data: [$weekNet],
                             backgroundColor: "rgba(144, 238, 144, 0.6)"
                         }
                     ]
@@ -412,16 +493,16 @@ class MainActivity : AppCompatActivity() {
 
                 // Data for Monthly Sales Chart
                 const monthlySalesData = {
-                    labels: ["October", "November", "December", "January"],
+                    labels: [$monthLabel],
                     datasets: [
                         {
                             label: "Gross Sales",
-                            data: [0, 41600000, 48500000, 0],
+                            data: [$monthGross],
                             backgroundColor: "rgba(72, 180, 127, 0.6)"
                         },
                         {
                             label: "Net Sales",
-                            data: [0, 38100000, 44000000, 0],
+                            data: [$monthNet],
                             backgroundColor: "rgba(144, 238, 144, 0.6)"
                         }
                     ]
@@ -432,6 +513,7 @@ class MainActivity : AppCompatActivity() {
                     type: "bar",
                     data: weeklySalesData,
                     options: {
+                        animation: false,
                         responsive: true,
                         plugins: {
                             legend: { position: "top" }
@@ -444,6 +526,7 @@ class MainActivity : AppCompatActivity() {
                     type: "bar",
                     data: monthlySalesData,
                     options: {
+                        animation: false,
                         responsive: true,
                         plugins: {
                             legend: { position: "top" }
@@ -461,11 +544,11 @@ class MainActivity : AppCompatActivity() {
             <script>
                 // Data for Monthly Order Chart
                 const monthlyOrderData = {
-                    labels: ["October", "November", "December", "January"],
+                    labels: [$monthLabel],
                     datasets: [
                         {
                             label: "Total Order",
-                            data: [0, 115, 184, 0],
+                            data: [$monthTotalOrder],
                             backgroundColor: "rgba(144, 238, 144, 0.6)"
                         }
                     ]
@@ -473,11 +556,11 @@ class MainActivity : AppCompatActivity() {
 
                 // Data for Weekly Order Chart
                 const weeklyOrderData = {
-                    labels: ["08 Dec - 14 Dec", "15 Dec - 21 Dec", "22 Dec - 28 Dec", "29 Dec - 04 Jan"],
+                    labels: [$weekLabel],
                     datasets: [
                         {
                             label: "Total Order",
-                            data: [81, 0, 0, 0],
+                            data: [$weekTotalOrder],
                             backgroundColor: "rgba(144, 238, 144, 0.6)"
                         }
                     ]
@@ -488,6 +571,7 @@ class MainActivity : AppCompatActivity() {
                     type: "bar",
                     data: monthlyOrderData,
                     options: {
+                        animation: false,
                         responsive: true,
                         plugins: {
                             legend: { position: "top" }
@@ -500,6 +584,7 @@ class MainActivity : AppCompatActivity() {
                     type: "bar",
                     data: weeklyOrderData,
                     options: {
+                        animation: false,
                         responsive: true,
                         plugins: {
                             legend: { position: "top" }
@@ -531,4 +616,34 @@ data class Staff(
     val name: String,
     val totalTransaction: String,
     val summary: String
+)
+
+data class SalesByWeek(
+    val week : String,
+    val data : SalesItem
+)
+
+data class SalesByMonth(
+    val month : String,
+    val data: SalesItem
+)
+
+data class SalesItem(
+    val totalSales : String,
+    val totalSubtotal : String,
+    val totalGrossSales : String,
+    val totalTax : String,
+    val totalNetSales : String,
+    val totalServiceCharge : String,
+    val totalRounding : String,
+    val totalCOGS : String,
+    val totalDiscount : String,
+    val totalPromotion : String,
+    val totalPromotionQuantity : Int,
+    val totalTransaction: Int,
+    val totalItems : Int,
+    val totalCustomers : Int,
+    val totalVoidTransaction : Int,
+    val totalVoidAmount : String,
+    val totalVoidItems : Int
 )
