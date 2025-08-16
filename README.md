@@ -17,13 +17,14 @@ with charts using Chart.js directly in your Android app.
 
 ### PDF Example
 
-[📄 Download PDF Example](example%20file.pdf)
+[example file.pdf](https://github.com/user-attachments/files/21812329/example.file.pdf)
 
 ### Video Example
 
-[▶️ Watch Video Example](Screen_recording_20250816_180103.mp4)
+https://github.com/user-attachments/assets/365d54ec-5625-4f34-b2a9-b716925d16a7
 
 ## Getting Started
+
 
 ### Prerequisites
 
@@ -35,7 +36,7 @@ with charts using Chart.js directly in your Android app.
 
 1. Clone this repository:
    ```sh
-   git clone <repo-url>
+   git clone <https://github.com/swordman234/androidhtml2pdf.git>
    ```
 2. Open with Android Studio
 3. Build and run the project on your device or emulator
@@ -63,6 +64,7 @@ app/
 ## Main Components
 
 - `MainActivity.kt`: Generates HTML, renders in WebView, and prints to PDF using system PDF print
+- `PdfPrint.kt`: Utility for sending WebView content to PDF using Android Print framework
 - Data classes: Product, PaymentType, Staff, SalesItem, SalesByWeek, SalesByMonth
 - Chart rendering: [Chart.js](https://www.chartjs.org/)
 
