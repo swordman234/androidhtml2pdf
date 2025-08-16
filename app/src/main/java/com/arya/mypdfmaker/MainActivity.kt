@@ -40,6 +40,8 @@ class MainActivity : AppCompatActivity() {
 
             // Call your PDF export
             exportPdf(this, folderUri)
+        }else{
+            Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -98,6 +100,44 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+        innerWebView.loadDataWithBaseURL(null, gettingDataHtml(), "text/html", "UTF-8", null)
+    }
+
+    private fun setupPermissions() {
+        if (!checkPermission(permissions)) {
+            ActivityCompat.requestPermissions(this, permissions, 10)
+        }
+    }
+    private fun checkPermission(permissionArray: Array<String>): Boolean {
+        var allSuccess = true
+        for (i in permissionArray.indices) {
+            if (ActivityCompat.checkSelfPermission(this, permissionArray[i]) != PackageManager.PERMISSION_GRANTED){
+                allSuccess = false
+            }
+        }
+        return allSuccess
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.main)
+
+        setupPermissions()
+
+        webView = binding.webview
+        webView.webViewClient = WebViewClient()
+        webView.settings.javaScriptEnabled = true
+
+        webView.loadDataWithBaseURL(null, gettingDataHtml(), "text/html", "UTF-8", null)
+
+        binding.btnCreatePdf.setOnClickListener {
+            openFolderPicker()
+        }
+
+    }
+
+    private fun gettingDataHtml() : String{
         val headerHTML = headerHTML("123", "Arya Suka", "12 April 2020")
         val summaryHTML = summaryHTML("12.000", "12", "11.000", "50", "1", "100")
         val top10productList = ArrayList<Product>()
@@ -140,7 +180,7 @@ class MainActivity : AppCompatActivity() {
                         10000*i,
                         "${10000*i}",
                         10000*i,
-                        )
+                    )
                 )
             )
         }
@@ -168,46 +208,11 @@ class MainActivity : AppCompatActivity() {
                         10000*i,
                         "${10000*i}",
                         10000*i,
-                        )
+                    )
                 )
             )
         }
-
-        val dataHTML = settingHTML() + headerHTML + summaryHTML + top10product + paymentType + staff + profitLossHTML + chartHTML(salesByWeek, salesByMonth)
-        innerWebView.loadDataWithBaseURL(null, dataHTML, "text/html", "UTF-8", null)
-    }
-
-    private fun setupPermissions() {
-        if (!checkPermission(permissions)) {
-            ActivityCompat.requestPermissions(this, permissions, 10)
-        }
-    }
-    private fun checkPermission(permissionArray: Array<String>): Boolean {
-        var allSuccess = true
-        for (i in permissionArray.indices) {
-            if (ActivityCompat.checkSelfPermission(this, permissionArray[i]) != PackageManager.PERMISSION_GRANTED){
-                allSuccess = false
-            }
-        }
-        return allSuccess
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding.main)
-
-        setupPermissions()
-
-//        webView = binding.webview
-//        webView.webViewClient = WebViewClient()
-//        webView.settings.javaScriptEnabled = true
-//        webView.loadDataWithBaseURL(null, getHtmlFromFile(), "text/html", "UTF-8", null)
-
-        binding.btnCreatePdf.setOnClickListener {
-            openFolderPicker()
-        }
-
+        return settingHTML() + headerHTML + summaryHTML + top10product + paymentType + staff + profitLossHTML + chartHTML(salesByWeek, salesByMonth)
     }
 
     //style setting, script for chart, and first body in here
